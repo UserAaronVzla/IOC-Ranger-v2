@@ -45,7 +45,7 @@ A fast, colorful, and extensible IOC checker for **hashes, IPs, domains, and URL
 
 ### Windows (CMD)
 ```bat
-git clone https://github.com/UserAaronVzla/IOC-Ranger
+git clone https://github.com/UserAaronVzla/IOC-Ranger-v2
 cd IOC-Ranger
 python -m venv .venv && call .venv\Scripts\activate.bat
 python -m pip install -r requirements.txt
@@ -56,7 +56,7 @@ python -m ioc_ranger -t mixed -i inputs\iocs_mixed.txt -f table
 
 ### macOS/Linux
 ```bash
-git clone https://github.com/UserAaronVzla/IOC-Ranger
+git clone https://github.com/UserAaronVzla/IOC-Ranger-v2
 cd IOC-Ranger
 python -m venv .venv && source .venv/bin/activate
 python -m pip install -r requirements.txt
