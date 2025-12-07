@@ -1,0 +1,112 @@
+# IOC Ranger
+
+<p align="center">
+  <a href="LICENSE"><img src="https://img.shields.io/badge/License-MIT-blue.svg" /></a>
+  <img src="https://img.shields.io/badge/Python-3.10%2B-blue" />
+  <img src="https://img.shields.io/badge/Platform-Windows%20%7C%20macOS%20%7C%20Linux-informational" />
+  <img src="https://img.shields.io/badge/Status-Active-brightgreen" />
+</p>
+
+A fast, colorful, and extensible IOC checker for **hashes, IPs, domains, and URLs**.
+
+- **VirusTotal**: file reputation, detections, and **code-signing** info  
+- **AbuseIPDB**: IP abuse confidence, reports, last reported time  
+- **IPQualityScore**: IP/Domain/URL risk, **VPN/Proxy/TOR** flags, fraud score
+- **AlienVault OTX**: Pulse counts and threat intelligence
+- **Shodan**: Open ports and vulnerabilities
+- **GreyNoise**: Internet background noise and riot status
+- **ThreatFox**: Threat confidence and type
+- **URLScan.io**: Page screenshots and risk scores
+
+## Table of contents
+- [Features](#features)
+- [Quickstart](#quickstart)
+- [Usage](#usage)
+- [Configuration](#configuration)
+- [Examples](#examples)
+- [Roadmap](#roadmap)
+- [Social](#social)
+
+
+## Features
+- Interactive CLI with cool banner (Rich) and **Progress Bar**
+- **Auto-classify**: hashes • IPs • domains • URLs
+- **HTML Reporting**: Generate standalone dashboards
+- **Flexible Inputs**: Pipe from stdin or pass arguments
+- **VirusTotal** (hash reputation & code-signing)
+- **AbuseIPDB** (abuse score, last reported)
+- **IPQualityScore** (risk + VPN/Proxy/TOR flags)
+- **AlienVault OTX**, **Shodan**, **GreyNoise**, **ThreatFox**, **URLScan**
+- CSV/JSON tables, simple on-disk caching
+- Windows/macOS/Linux, no secrets committed (.env)
+
+
+## Quickstart
+
+### Windows (CMD)
+```bat
+git clone https://github.com/UserAaronVzla/IOC-Ranger
+cd IOC-Ranger
+python -m venv .venv && call .venv\Scripts\activate.bat
+python -m pip install -r requirements.txt
+copy .env.example .env  &  notepad .env   :: fill keys
+python -m ioc_ranger -t mixed -i inputs\iocs_mixed.txt -f table
+```
+
+
+### macOS/Linux
+```bash
+git clone https://github.com/UserAaronVzla/IOC-Ranger
+cd IOC-Ranger
+python -m venv .venv && source .venv/bin/activate
+python -m pip install -r requirements.txt
+cp .env.example .env && $EDITOR .env
+python -m ioc_ranger -t mixed -i inputs/iocs_mixed.txt -f table
+```
+
+
+## Usage
+```bash
+python -m ioc_ranger --help
+# Common Interactive:
+python -m ioc_ranger
+# Common Noninteractive:
+python -m ioc_ranger -t hashes -i inputs/hashes.txt -f table csv
+python -m ioc_ranger -t mixed  -i inputs/iocs_mixed.txt -o outputs/results -f table csv json html
+```
+
+
+## Configuration
+```dotenv
+VT_API_KEY=...
+ABUSEIPDB_API_KEY=...
+IPQS_API_KEY=...
+ALIENVAULT_API_KEY=...
+SHODAN_API_KEY=...
+GREYNOISE_API_KEY=...
+THREATFOX_API_KEY=...
+URLSCAN_API_KEY=...
+CACHE_TTL=86400
+```
+
+
+## Examples
+- **Hashes file** → show a real snippet of output table and a link to VT GUI from CSV.
+- **IPs file** → highlight AbuseIPDB score + IPQS VPN/Proxy flags.
+- **Mixed file** → show how types are auto-detected.
+
+
+## Roadmap
+- [x] Progress bar + ETA
+- [x] JSONL & Markdown/HTML report exports
+- [x] Expanded OSINT sources
+- [ ] WHOIS + GeoIP enrichment
+- [ ] Delta mode (compare runs)
+- [ ] Windows EXE build (PyInstaller)
+- [ ] GitHub Actions (lint/test/build)
+
+
+## Social
+- 📧 A.eskenazicohen@gmail.com
+- 💼 [LinkedIn](https://linkedin.com/in/aaron-eskenazi-vzla)
+- 🐈‍⬛ [GitHub](https://github.com/UserAaronVzla)
