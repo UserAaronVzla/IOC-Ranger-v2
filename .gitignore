@@ -32,7 +32,7 @@ build/
 .idea/
 
 # Project outputs
-# outputs/*
-# !outputs/.gitkeep
-# inputs/*
-# !inputs/.gitkeep
+outputs/*
+!outputs/.gitkeep
+inputs/*
+!inputs/.gitkeep
