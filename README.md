@@ -82,6 +82,9 @@ python -m ioc_ranger_v2 -t mixed  -i inputs/iocs_mixed.txt -o outputs/results -f
 
 
 ## Configuration
+
+Copy `.env.example` to `.env` and fill in your API keys:
+
 ```dotenv
 VT_API_KEY=...
 ABUSEIPDB_API_KEY=...
@@ -91,14 +94,48 @@ SHODAN_API_KEY=...
 GREYNOISE_API_KEY=...
 THREATFOX_API_KEY=...
 URLSCAN_API_KEY=...
+HUNTER_API_KEY=...
+VIEWDNS_API_KEY=...
 CACHE_TTL=86400
 ```
 
+All keys are optional — sources with missing keys are skipped gracefully. `CACHE_TTL` controls how long results are cached on disk (seconds, default 86400 = 24 h).
+
+| Key | Service | Used for |
+|-----|---------|----------|
+| `VT_API_KEY` | VirusTotal | Hash/domain/URL reputation |
+| `ABUSEIPDB_API_KEY` | AbuseIPDB | IP abuse score |
+| `IPQS_API_KEY` | IPQualityScore | IP/domain/URL risk & VPN/Proxy/TOR |
+| `ALIENVAULT_API_KEY` | AlienVault OTX | Threat pulse counts |
+| `SHODAN_API_KEY` | Shodan | Open ports & vulnerabilities |
+| `GREYNOISE_API_KEY` | GreyNoise | Internet noise classification |
+| `THREATFOX_API_KEY` | ThreatFox | Malware confidence & type |
+| `URLSCAN_API_KEY` | URLScan.io | Page risk & screenshots |
+| `HUNTER_API_KEY` | Hunter.io | Email deliverability & disposable check |
+| `VIEWDNS_API_KEY` | ViewDNS.info | Email domain reputation & shared MX |
+
 
 ## Examples
-- **Hashes file** → show a real snippet of output table and a link to VT GUI from CSV.
-- **IPs file** → highlight AbuseIPDB score + IPQS VPN/Proxy flags.
-- **Mixed file** → show how types are auto-detected.
+
+**Check a mixed input file (auto-classify each IOC):**
+```bash
+python -m ioc_ranger_v2 -t mixed -i inputs/iocs_mixed.txt -f table csv json
+```
+
+**Check hashes only and export to HTML:**
+```bash
+python -m ioc_ranger_v2 -t hashes -i inputs/hashes.txt -f html -o outputs/hashes
+```
+
+**Pipe IOCs directly from the command line:**
+```bash
+echo "8.8.8.8" | python -m ioc_ranger_v2 -t ip -f table
+```
+
+**Increase concurrency for large batches:**
+```bash
+python -m ioc_ranger_v2 -t mixed -i inputs/iocs_mixed.txt -c 40 -f json
+```
 
 <img width="1901" height="285" alt="image" src="https://github.com/user-attachments/assets/69a595a2-6bac-4786-aa45-58b855d6dc01" />
 
@@ -106,10 +143,9 @@ CACHE_TTL=86400
 ## Roadmap
 - [x] Progress bar + ETA
 - [x] JSONL & Markdown/HTML report exports
-- [x] Expanded OSINT sources
+- [x] Expanded OSINT sources (Hunter.io, ViewDNS, ThreatFox, GreyNoise, Shodan)
 - [ ] WHOIS + GeoIP enrichment
 - [ ] Delta mode (compare runs)
-- [ ] Windows EXE build (PyInstaller)
 - [ ] GitHub Actions (lint/test/build)
 
 
