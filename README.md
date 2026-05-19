@@ -7,7 +7,7 @@
   <img src="https://img.shields.io/badge/Status-Active-brightgreen" />
 </p>
 
-A fast, colorful, and extensible IOC checker for **hashes, IPs, domains, and URLs**.
+A fast, colorful, and extensible IOC checker for **hashes, IPs, domains, URLs, and emails**.
 
 - **VirusTotal**: file reputation, detections, and **code-signing** info  
 - **AbuseIPDB**: IP abuse confidence, reports, last reported time  
@@ -17,6 +17,8 @@ A fast, colorful, and extensible IOC checker for **hashes, IPs, domains, and URL
 - **GreyNoise**: Internet background noise and riot status
 - **ThreatFox**: Threat confidence and type
 - **URLScan.io**: Page screenshots and risk scores
+- **Hunter.io**: Email deliverability and disposable address detection
+- **ViewDNS.info**: Email domain reputation and shared MX analysis
 
 <img width="1643" height="602" alt="image" src="https://github.com/user-attachments/assets/877ddf32-e784-4d67-863d-a33af9b0e87f" />
 
