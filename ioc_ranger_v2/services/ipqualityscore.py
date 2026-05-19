@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import httpx
+from urllib.parse import quote
 
 from ..ioc_types import DomainResult, IPResult, URLResult
 
@@ -36,6 +37,8 @@ async def check_domain(client: httpx.AsyncClient, api_key: str, domain: str) -> 
     url = f"{BASE}/domain/{api_key}/{domain}"
     params = {"strictness": "1"}
     r = await client.get(url, params=params, timeout=30)
+    if r.status_code == 404:
+        return DomainResult(ioc=domain)
     r.raise_for_status()
     j = r.json() or {}
 
@@ -50,9 +53,12 @@ async def check_domain(client: httpx.AsyncClient, api_key: str, domain: str) -> 
 
 
 async def check_url(client: httpx.AsyncClient, api_key: str, url: str) -> URLResult:
-    u = f"{BASE}/url/{api_key}/{url}"
+    encoded = quote(url, safe="")
+    u = f"{BASE}/url/{api_key}/{encoded}"
     params = {"strictness": "1"}
     r = await client.get(u, params=params, timeout=45)
+    if r.status_code == 404:
+        return URLResult(ioc=url)
     r.raise_for_status()
     j = r.json() or {}
 

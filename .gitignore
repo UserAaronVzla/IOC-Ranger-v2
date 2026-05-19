@@ -36,3 +36,6 @@ outputs/*
 !outputs/.gitkeep
 inputs/*
 !inputs/.gitkeep
+
+# Runtime cache
+data/cache.json

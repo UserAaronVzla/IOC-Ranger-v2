@@ -27,7 +27,11 @@ def print_table(rows: Sequence[MixedRow]) -> None:
         k = r.kind
         d = r.data
         if k == "hash":
+            h_type = "MD5" if len(d.ioc) == 32 else "SHA1" if len(d.ioc) == 40 else "SHA256"
+            name = getattr(d, 'primary_name', '') or '-'
             summary = (
+                f"[{h_type}] "
+                f"name:{name} "
                 f"VT:{'Y' if getattr(d, 'exists_on_vt', False) else 'N'} "
                 f"mal:{getattr(d, 'malicious_vendors', '-')} "
                 f"signed:{'Y' if getattr(d, 'is_signed', False) else 'N'} "
@@ -195,6 +199,11 @@ def write_html(rows: Sequence[MixedRow], base_path: str) -> Path:
         # Create a summary string similar to print_table but HTML friendly
         summary = []
         if r.kind == "hash":
+            h_type = "MD5" if len(d.ioc) == 32 else "SHA1" if len(d.ioc) == 40 else "SHA256"
+            summary.append(f"<span class='badge info'>{h_type}</span>")
+            name = getattr(d, 'primary_name', '') or '-'
+            if name != '-':
+                summary.append(f"<span class='badge info'>{name}</span>")
             if getattr(d, "exists_on_vt", False):
                 summary.append(
                     f"<span class='badge vt'>VT: {getattr(d, 'malicious_vendors', 0)}</span>"
