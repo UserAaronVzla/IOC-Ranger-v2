@@ -7,6 +7,7 @@ _sha1 = re.compile(r"^[a-fA-F0-9]{40}$")
 _sha256 = re.compile(r"^[a-fA-F0-9]{64}$")
 _ipv4 = re.compile(r"^(?:\d{1,3}\.){3}\d{1,3}$")
 _url = re.compile(r"^(https?://)", re.IGNORECASE)
+_email = re.compile(r"^[^@\s]+@[^@\s]+\.[^@\s]+$")
 
 
 def is_hash(s: str) -> bool:
@@ -21,6 +22,10 @@ def is_ip(s: str) -> bool:
 
 def is_url(s: str) -> bool:
     return bool(_url.match(s))
+
+
+def is_email(s: str) -> bool:
+    return bool(_email.match(s))
 
 
 def is_domain(s: str) -> bool:
@@ -38,6 +43,8 @@ def classify(s: str) -> str:
         return "ip"
     if is_url(s):
         return "url"
+    if is_email(s):
+        return "email"
     if is_domain(s):
         return "domain"
     return "unknown"
