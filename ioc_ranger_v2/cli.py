@@ -27,13 +27,14 @@ from .banner import print_banner
 from .cache import get as cache_get
 from .cache import set_ as cache_set
 from .config import get_settings
-from .ioc_types import DomainResult, HashResult, IPResult, MixedRow, URLResult
+from .ioc_types import DomainResult, EmailResult, HashResult, IPResult, MixedRow, URLResult
 from .services import (
     abuse_check_ip,
     get_domain_info,
     get_hash_info,
     get_url_info,
     greynoise_check_ip,
+    hunter_verify_email,
     ipqs_check_domain,
     ipqs_check_ip,
     ipqs_check_url,
@@ -41,6 +42,7 @@ from .services import (
     shodan_check_ip,
     threatfox_search,
     urlscan_search,
+    viewdns_check_email,
 )
 from .validators import classify
 
@@ -233,6 +235,8 @@ async def process(dtype: str, items: list[str], settings, max_concurrency: int =
                             res = await handle_domain(client, s, settings)
                         elif kind == "url":
                             res = await handle_url(client, s, settings)
+                        elif kind == "email":
+                            res = await handle_email(client, s, settings)
                         else:
                             res = MixedRow(
                                 kind="unknown", data=URLResult(ioc=s), notes=["Unrecognized IOC type"]
@@ -268,14 +272,15 @@ async def handle_hash(client: httpx.AsyncClient, h: str, settings) -> MixedRow:
         return MixedRow(kind="hash", data=base, notes=["cache"])
 
     notes: list[str] = []
+    _vt_error = False
 
     # VirusTotal
     if settings.vt_api_key:
         try:
             vt_res = await get_hash_info(client, settings.vt_api_key, h)
-            # Merge VT result into base
             base = vt_res
         except httpx.HTTPError as e:
+            _vt_error = True
             notes.append(f"VT error: {_scrub_error(e, settings)}")
     else:
         notes.append("Missing VT_API_KEY")
@@ -294,9 +299,6 @@ async def handle_hash(client: httpx.AsyncClient, h: str, settings) -> MixedRow:
     except Exception as e:
         notes.append(f"ThreatFox error: {_scrub_error(e, settings)}")
 
-    # Shodan (Hashes not supported directly, skipping)
-    # GreyNoise (Hashes not supported directly, skipping)
-
     # URLScan
     try:
         us_res = await urlscan_search(client, settings.urlscan_key, h)
@@ -306,20 +308,8 @@ async def handle_hash(client: httpx.AsyncClient, h: str, settings) -> MixedRow:
     except Exception as e:
         notes.append(f"URLScan error: {_scrub_error(e, settings)}")
 
-    except Exception as e:
-        notes.append(f"ThreatFox error: {e}")
-
-    # URLScan
-    try:
-        us_res = await urlscan_search(client, settings.urlscan_key, h)
-        base.urlscan_uuid = us_res.get("uuid")
-        base.urlscan_score = us_res.get("score")
-        base.urlscan_screenshot = us_res.get("screenshot")
-    except Exception as e:
-        notes.append(f"URLScan error: {_scrub_error(e, settings)}")
-
-    # Only cache if there is a key to fetch data, to avoid poisoning cache with empty results
-    if settings.vt_api_key:
+    # Don't cache VT API errors (rate limits, auth failures) — only cache success or genuine 404
+    if settings.vt_api_key and not _vt_error:
         cache_set(key, base.__dict__)
     return MixedRow(kind="hash", data=base, notes=notes)
 
@@ -538,6 +528,48 @@ async def handle_url(client: httpx.AsyncClient, url: str, settings) -> MixedRow:
         notes.append(f"ThreatFox error: {_scrub_error(e, settings)}")
 
     return MixedRow(kind="url", data=base, notes=notes)
+
+
+async def handle_email(client: httpx.AsyncClient, email: str, settings) -> MixedRow:
+    """
+    Hunter.io + ViewDNS.info for email reputation.
+    """
+    base = EmailResult(ioc=email)
+    notes: list[str] = []
+
+    cache_key = f"email:{email}"
+    cached = cache_get(cache_key, settings.cache_ttl)
+    if cached:
+        base = EmailResult(**cached)
+        return MixedRow(kind="email", data=base, notes=["cache"])
+
+    # Hunter.io
+    if settings.hunter_key:
+        try:
+            hunter_data = await hunter_verify_email(client, settings.hunter_key, email)
+            base.hunter_result = hunter_data.get("hunter_result")
+            base.hunter_score = hunter_data.get("hunter_score")
+            base.disposable = hunter_data.get("disposable")
+            base.webmail = hunter_data.get("webmail")
+            base.mx_records = hunter_data.get("mx_records")
+        except httpx.HTTPError as e:
+            notes.append(f"Hunter error: {_scrub_error(e, settings)}")
+    else:
+        notes.append("Missing HUNTER_API_KEY")
+
+    # ViewDNS
+    if settings.viewdns_key:
+        try:
+            vdns_data = await viewdns_check_email(client, settings.viewdns_key, email)
+            base.viewdns_reputation = vdns_data.get("viewdns_reputation")
+            base.viewdns_shared_mx = vdns_data.get("viewdns_shared_mx")
+        except httpx.HTTPError as e:
+            notes.append(f"ViewDNS error: {_scrub_error(e, settings)}")
+    else:
+        notes.append("Missing VIEWDNS_API_KEY")
+
+    cache_set(cache_key, base.__dict__)
+    return MixedRow(kind="email", data=base, notes=notes)
 
 
 # Entry point when executed as a module via `python -m ioc_ranger_v2`

@@ -16,6 +16,8 @@ class Settings:
     shodan_key: str | None
     greynoise_key: str | None
     threatfox_key: str | None
+    hunter_key: str | None
+    viewdns_key: str | None
     cache_ttl: int
 
 
@@ -29,5 +31,7 @@ def get_settings() -> Settings:
         shodan_key=os.getenv("SHODAN_API_KEY"),
         greynoise_key=os.getenv("GREYNOISE_API_KEY"),
         threatfox_key=os.getenv("THREATFOX_API_KEY"),
+        hunter_key=os.getenv("HUNTER_API_KEY"),
+        viewdns_key=os.getenv("VIEWDNS_API_KEY"),
         cache_ttl=int(os.getenv("CACHE_TTL", "86400")),
     )

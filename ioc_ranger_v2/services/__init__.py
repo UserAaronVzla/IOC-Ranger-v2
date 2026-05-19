@@ -1,20 +1,15 @@
-# Service-layer exports
 from .abuseipdb import check_ip as abuse_check_ip
 from .alienvault import get_pulses as otx_get_pulses
 from .greynoise import check_ip as greynoise_check_ip
-from .ipqualityscore import (
-    check_domain as ipqs_check_domain,
-)
-from .ipqualityscore import (
-    check_ip as ipqs_check_ip,
-)
-from .ipqualityscore import (
-    check_url as ipqs_check_url,
-)
+from .hunter import verify_email as hunter_verify_email
+from .ipqualityscore import check_domain as ipqs_check_domain
+from .ipqualityscore import check_ip as ipqs_check_ip
+from .ipqualityscore import check_url as ipqs_check_url
 from .shodan import check_ip as shodan_check_ip
 from .threatfox import search_ioc as threatfox_search
 from .urlscan import search_url as urlscan_search
-from .virustotal import get_hash_info, get_domain_info, get_url_info
+from .viewdns import check_email as viewdns_check_email
+from .virustotal import get_domain_info, get_hash_info, get_url_info
 
 __all__ = [
     "abuse_check_ip",
@@ -24,9 +19,11 @@ __all__ = [
     "get_hash_info",
     "get_domain_info",
     "get_url_info",
+    "hunter_verify_email",
     "otx_get_pulses",
     "urlscan_search",
     "shodan_check_ip",
     "greynoise_check_ip",
     "threatfox_search",
+    "viewdns_check_email",
 ]
