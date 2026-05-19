@@ -1,7 +1,7 @@
 from dataclasses import dataclass, field
 from typing import Literal
 
-IOCType = Literal["hash", "ip", "domain", "url"]
+IOCType = Literal["hash", "ip", "domain", "url", "email"]
 
 
 @dataclass
@@ -82,7 +82,19 @@ class URLResult:
 
 
 @dataclass
+class EmailResult:
+    ioc: str
+    hunter_result: str | None = None
+    hunter_score: int | None = None
+    disposable: bool | None = None
+    webmail: bool | None = None
+    mx_records: bool | None = None
+    viewdns_reputation: str | None = None
+    viewdns_shared_mx: int | None = None
+
+
+@dataclass
 class MixedRow:
     kind: IOCType
-    data: HashResult | IPResult | DomainResult | URLResult
+    data: HashResult | IPResult | DomainResult | URLResult | EmailResult
     notes: list[str] = field(default_factory=list)
